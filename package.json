@@ -4,16 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-server": "npm install",
+    "start-server": "node index.js",
+    "install-client": "npm install",
+    "build-client": "npm run build",
+    "start-client": "npm run start"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alex Eisenach",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongodb": "^6.5.0",
-    "mongoimport": "^1.0.6",
-    "multer": "^1.4.5-lts.1"
+    "mongoimport": "^1.0.6"
   }
 }
