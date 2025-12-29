@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "install-server": "npm install",
     "start-server": "node index.js",
@@ -14,13 +15,15 @@
   "keywords": [],
   "author": "Alex Eisenach",
   "license": "ISC",
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mathjs": "^15.1.0",
-    "mongodb": "^6.5.0",
-    "mongoimport": "^1.0.6",
+    "mongodb": "^6.10.0",
     "numeric": "^1.2.6"
   }
 }

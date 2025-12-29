@@ -8,12 +8,22 @@ let app = Express();
 app.use(Express.json()); // this was extremely necessary
 app.use(cors());
 
-let database;
+const client = new MongoClient(process.env.URI);
 
-app.listen(5038, () => {
-    database = new MongoClient(process.env.URI)
-        .db(process.env.DATABASENAME);
-    console.log('Successful');
+async function connectDB() {
+    try {
+        await client.connect();
+        database = client.db(process.env.DATABASENAME);
+        console.log('Connected to MongoDB successfully');
+    } catch (err) {
+        console.error('Failed to connect to MongoDB:', err);
+    }
+}
+
+const PORT = process.env.PORT || 5038;
+app.listen(PORT, async () => {
+    await connectDB();
+    console.log(`Server is running on port ${PORT}`);
 });
 
 app.get('/gets/metadata', async function (request, response) {
