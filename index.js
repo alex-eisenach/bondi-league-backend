@@ -8,6 +8,7 @@ let app = Express();
 app.use(Express.json()); // this was extremely necessary
 app.use(cors());
 
+let database;
 const client = new MongoClient(process.env.URI);
 
 async function connectDB() {
