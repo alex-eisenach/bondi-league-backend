@@ -11,21 +11,24 @@ app.use(cors());
 let database;
 const client = new MongoClient(process.env.URI);
 
-async function connectDB() {
+const PORT = process.env.PORT || 5038;
+
+async function startServer() {
     try {
         await client.connect();
         database = client.db(process.env.DATABASENAME);
         console.log('Connected to MongoDB successfully');
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
     } catch (err) {
-        console.error('Failed to connect to MongoDB:', err);
+        console.error('Failed to connect to MongoDB or start server:', err);
+        process.exit(1);
     }
 }
 
-const PORT = process.env.PORT || 5038;
-app.listen(PORT, async () => {
-    await connectDB();
-    console.log(`Server is running on port ${PORT}`);
-});
+startServer();
 
 app.get('/gets/metadata', async function (request, response) {
     let col = await database.collection(process.env.COLLECTION);
