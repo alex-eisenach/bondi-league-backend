@@ -9,7 +9,12 @@ app.use(Express.json()); // this was extremely necessary
 app.use(cors());
 
 let database;
-const client = new MongoClient(process.env.URI);
+const client = new MongoClient(process.env.URI, {
+    tls: true,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    serverSelectionTimeoutMS: 10000
+});
 
 const PORT = process.env.PORT || 5038;
 
