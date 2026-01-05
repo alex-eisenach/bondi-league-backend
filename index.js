@@ -179,6 +179,22 @@ app.get('/gets/leagueStats/:year/:week', async function (request, response) {
         return regEx ? regEx : null;
     };
 
+    // Helper to compare two property keys chronologically
+    const compareDateKeys = (a, b) => {
+        const matchA = parseDateString(a);
+        const matchB = parseDateString(b);
+        if (!matchA) return 1; // Put non-date keys at the end
+        if (!matchB) return -1;
+
+        const yrA = parseInt(matchA[1]);
+        const wkA = parseInt(matchA[2]);
+        const yrB = parseInt(matchB[1]);
+        const wkB = parseInt(matchB[2]);
+
+        if (yrA !== yrB) return yrA - yrB;
+        return wkA - wkB;
+    };
+
     let result = {};
     let scoresList = [];
 
@@ -186,25 +202,36 @@ app.get('/gets/leagueStats/:year/:week', async function (request, response) {
 
     for (const obj of allData) {
         let handicapScores = [];
+        let ytdScores = [];
         let grossScore = null;
         const golferName = obj['Names'];
 
         // Sort keys to ensure chronological order for handicap calculation
-        const keys = Object.keys(obj).sort();
+        const keys = Object.keys(obj).sort(compareDateKeys);
 
         for (const key of keys) {
             if (key === targetDateStr) {
                 if (obj[key] !== '' && obj[key] !== null) {
                     grossScore = parseInt(obj[key]);
+                    ytdScores.push(grossScore);
                 }
             } else {
                 const match = parseDateString(key);
                 if (match) {
                     const [_, yr, wk] = match;
-                    // Only include scores BEFORE the target date
-                    if (yr < year || (yr === year && parseInt(wk) < parseInt(week))) {
+                    const iYr = parseInt(yr);
+                    const iWk = parseInt(wk);
+                    const tYr = parseInt(year);
+                    const tWk = parseInt(week);
+
+                    // Handicap calculation scores (strictly before target)
+                    if (iYr < tYr || (iYr === tYr && iWk < tWk)) {
                         if (obj[key] !== '' && obj[key] !== null) {
                             handicapScores.push(parseInt(obj[key]));
+                            // Hottest/Coldest scores (this year up to target)
+                            if (iYr === tYr) {
+                                ytdScores.push(parseInt(obj[key]));
+                            }
                         }
                     }
                 }
@@ -212,12 +239,16 @@ app.get('/gets/leagueStats/:year/:week', async function (request, response) {
         }
 
         const hcap = stats.handicap(handicapScores);
+        const ytdMean = ytdScores.length > 0 ? stats.avgScore(ytdScores) : 0;
+
         if (grossScore !== null) {
             scoresList.push({
                 name: golferName,
                 handicap: hcap,
                 gross: grossScore,
-                net: grossScore - hcap
+                net: grossScore - hcap,
+                ytdMean: ytdMean,
+                handicapRounds: handicapScores.length
             });
         }
     }
@@ -232,7 +263,9 @@ app.get('/gets/leagueStats/:year/:week', async function (request, response) {
             flight: (i < midpoint) ? 'A' : 'B',
             gross: s.gross,
             net: s.net,
-            handicap: s.handicap
+            handicap: s.handicap,
+            ytdMean: s.ytdMean,
+            handicapRounds: s.handicapRounds
         };
     }
 

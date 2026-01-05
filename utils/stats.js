@@ -20,14 +20,14 @@ const handicap = (scores) => {
         if (scores.length < 20) {
             const bestEight = [...scores]
                 .sort((a, b) => a - b)
-                .slice(0, nRounds + 1);
+                .slice(0, nRounds);
             return slopeUteCreek * (mean(bestEight) - rating);
         } else {
             const bestEight = [...scores]
                 .reverse() //assumes the scores are in chronological order
-                .slice(0, 21)
+                .slice(0, 20)
                 .sort((a, b) => a - b)
-                .slice(0, nRounds + 1);
+                .slice(0, nRounds);
             return slopeUteCreek * (mean(bestEight) - rating);
         }
     }
